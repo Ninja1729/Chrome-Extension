@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+
+  "name": "Pattu",
+  "description": "YouTube Monitor",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "love.png",
+    "default_popup": "popup.html"
+  },
+    
+ "background": {
+    "scripts": ["bg.js"],
+    "persistent": true
+  },
+
+  
+  "permissions": ["notifications", "tabs", "storage", "alarms"]
+}
