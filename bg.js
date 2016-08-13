@@ -24,35 +24,45 @@ chrome.storage.local.get('datevalue', function(result){
     }
 });*/
 
-
-
-
-var dt = new Date();
-var d = dt.getDate();
-var m = dt.getMonth();
-var y = dt.getYear();
-var keyName = d+"/"+m+"/"+y;
 var seconds; 
-chrome.storage.local.get(keyName, function(result){
-    
-    seconds = result.sValue;
-    
-    if( seconds == undefined){
-        seconds = 0;
-        chrome.storage.local.set({keyName: seconds}, function() {
-                dt.setDate(d.getDate() - 1);
-                var d = dt.getDate();
-                var m = dt.getMonth();
-                var y = dt.getYear();
-                var keyNameOld = d+"/"+m+"/"+y;
-                    chrome.storage.local.remove(keyNameOld);
+setStorage(0);
+
+function setStorage(sec){
+    var dt = new Date();
+    var d = dt.getDate();
+    var m = dt.getMonth();
+    var y = dt.getYear();
+    var keyName = d+"/"+m+"/"+y;
+    chrome.storage.local.get(keyName, function(result){
+
+        res = result.sValue; //keyname check
+           
+        if( res == undefined){
+            seconds = 0;
+            chrome.storage.local.set({keyName: seconds}, function() {
+                    dt.setDate(d.getDate() - 1);
+                    var d = dt.getDate();
+                    var m = dt.getMonth();
+                    var y = dt.getYear();
+                    var keyNameOld = d+"/"+m+"/"+y;
+                        chrome.storage.local.get(keyNameOld, function(result){
+                            chrome.storage.local.remove(keyNameOld);
+                        });
+                        
+                    });
+        }else{
+            chrome.storage.local.set({keyName: sec}, function() {
                 });
-    }else{
-        var min = Math.floor(seconds / 60);
-        chrome.browserAction.setBadgeText({
-        text: (min).toString()+"m"});
-    }
-});
+            
+            
+        }
+        if (sec == 0){
+                var min = Math.floor(seconds / 60);
+                chrome.browserAction.setBadgeText({
+                text: (min).toString()+"m"});
+        }
+    });
+}
 
 
 
@@ -68,8 +78,7 @@ chrome.tabs.onActivated.addListener(function(tab) {
                 refreshIntervalId = setInterval(function(){abc(tab.id)}, 1000);
             }
         }else{
-            chrome.storage.local.set({'sValue': seconds}, function() {
-                });
+            setStorage(seconds);
             clearInterval(refreshIntervalId);
             refreshIntervalId = -1;
         }
@@ -78,8 +87,7 @@ chrome.tabs.onActivated.addListener(function(tab) {
 
 //On browser close
 chrome.windows.onRemoved.addListener(function(windowId){
-    chrome.storage.local.set({'sValue': seconds}, function() {
-                });
+    setStorage(seconds);
     clearInterval(refreshIntervalId);
             refreshIntervalId = -1;
 });
